@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Task;
 use Illuminate\Http\Request;
-use App\Post;
-use Illuminate\Support\Facades\DB;
 
-class PostsController extends Controller
+class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,14 +14,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        //$posts = Post::all();
-        //$post = Post::where('title' , 'Post two')->get();
-        //$posts = DB::select('SELECT * FROM posts');
-        //$posts = Post::orderBy('title','desc')->take(1)->get();
-        //$posts = Post::orderBy('title','desc')->get();
-
-        $posts = Post::orderBy('created_at','desc')->paginate(10);
-        return view('posts.index')->with('posts',$posts);
+        return Task::all();
     }
 
     /**
@@ -32,7 +24,7 @@ class PostsController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        //
     }
 
     /**
@@ -43,19 +35,7 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'title' => 'required',
-            'body' => 'required'
-        ]);
-
-
-        //Create post
-        $post = new Post();
-        $post->title = $request->input('title');
-        $post->body = $request->input('body');
-        $post->save();
-
-        return redirect('/posts')->with('success' , 'Post created');
+        return Task::create($request->all());
     }
 
     /**
@@ -66,8 +46,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        $post = Post::find($id);
-        return view('posts.show')->with('post',$post);
+        return Task::find($id);
     }
 
     /**
@@ -90,7 +69,10 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $task = Task::findOrFail($id);
+        $task->update($request->all());
+
+        return $task;
     }
 
     /**
@@ -102,5 +84,12 @@ class PostsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function delete(Request $request, $id)
+    {
+        $task = Task::findOrFail($id);
+        $task->delete();
+        return 204;
     }
 }
